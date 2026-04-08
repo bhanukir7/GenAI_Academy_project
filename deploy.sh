@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # Configuration
-PROJECT_ID="your-project-id"
-REGION="us-central1" # Change this to 'us-central1' or other supported regions if you encounter 404s
+PROJECT_ID="urcloudoptimizer"
+REGION="us-central1" 
+# Use a specific region for Vertex AI for better stability
+AI_REGION="us-central1"
 
 # 1. Check Dependencies
 echo "Checking dependencies..."
@@ -44,4 +46,13 @@ echo "Deploying to Cloud Run..."
 cd terraform
 terraform apply -var="project_id=$PROJECT_ID" -var="region=$REGION" -auto-approve
 
-echo "Deployment complete!"
+# 7. ADD THIS STEP: Fix Environment Variables
+# Terraform often doesn't set these by default. This ensures your main.py
+# gets the correct Project ID and the 'global' location needed for Gemini 3.
+echo "Configuring Service Environment Variables..."
+gcloud run services update financial-news-classifier \
+  --set-env-vars GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=$AI_REGION \
+  --region $REGION \
+  --quiet
+
+echo "Deployment complete! Your app is now using Project: $PROJECT_ID and Location: $AI_REGION"

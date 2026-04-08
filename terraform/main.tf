@@ -51,21 +51,10 @@ resource "google_cloud_run_v2_service" "default" {
         name  = "GOOGLE_CLOUD_PROJECT"
         value = var.project_id
       }
-      env {
-        name  = "GOOGLE_CLOUD_LOCATION"
-        value = var.region
-      }
     }
   }
 
   depends_on = [google_project_service.run_api]
-}
-
-# Grant Vertex AI User role to the Cloud Run service account
-resource "google_project_iam_member" "vertex_ai_user" {
-  project = var.project_id
-  role    = "roles/aiplatform.user"
-  member  = "serviceAccount:${google_cloud_run_v2_service.default.template[0].service_account}"
 }
 
 # Allow unauthenticated access
