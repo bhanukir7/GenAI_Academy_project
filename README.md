@@ -1,20 +1,82 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Financial News Sentiment Classifier
 
-# Run and deploy your AI Studio app
+A production-ready, full-stack application that classifies financial news snippets into **Bullish**, **Bearish**, or **Neutral** categories using Google's Gemini 1.5 Flash model via Vertex AI.
 
-This contains everything you need to run your app locally.
+## 🚀 Features
 
-View your app in AI Studio: https://ai.studio/apps/0488f263-1fb5-4720-ba84-0ada1de67f04
+- **Real-time Classification:** Instant sentiment analysis of financial headlines.
+- **Enterprise Security:** Uses **Keyless IAM-based authentication** with Vertex AI. No API keys are stored or exposed.
+- **Production-Grade Backend:** FastAPI server handles AI logic and serves the frontend.
+- **Modern Frontend:** React + Tailwind CSS + Lucide Icons for a polished UI.
+- **Infrastructure as Code:** Fully automated deployment using Terraform.
+- **Containerized:** Dockerized for consistent deployment on Google Cloud Run.
 
-## Run Locally
+## 🛠️ Tech Stack
 
-**Prerequisites:**  Node.js
+- **Frontend:** React, TypeScript, Tailwind CSS, Lucide React, Framer Motion.
+- **Backend:** Python, FastAPI, Vertex AI SDK (`google-genai`).
+- **Infrastructure:** Terraform, Google Cloud Run, Artifact Registry.
+- **AI Model:** Gemini 1.5 Flash (via Vertex AI).
 
+## 🏗️ Architecture
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+This project follows Google Cloud best practices for security:
+1. **Frontend** sends news snippets to the **Backend**.
+2. **Backend** (running on Cloud Run) uses its **Service Account identity** to call **Vertex AI**.
+3. **IAM Permissions** (`roles/aiplatform.user`) are granted to the service account via Terraform.
+4. **Vertex AI** processes the request and returns a structured JSON response.
+
+## 📋 Prerequisites
+
+- [Google Cloud Project](https://console.cloud.google.com/) with billing enabled.
+- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) installed and authenticated.
+- [Docker](https://www.docker.com/) installed.
+- [Terraform](https://www.terraform.io/) installed.
+- [Node.js](https://nodejs.org/) and [Python 3.10+](https://www.python.org/) for local development.
+
+## 🚀 Deployment
+
+1. **Configure Project ID:**
+   Open `deploy.sh` and update the `PROJECT_ID` variable:
+   ```bash
+   PROJECT_ID="your-google-cloud-project-id"
+   ```
+
+2. **Run Deployment Script:**
+   ```bash
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
+   This script will:
+   - Build the React frontend.
+   - Initialize Terraform.
+   - Create a Docker repository in Artifact Registry.
+   - Build and push the Docker image.
+   - Deploy the service to Cloud Run with correct IAM permissions.
+
+## 💻 Local Development
+
+### Backend
+```bash
+pip install -r requirements.txt
+python main.py
+```
+
+### Frontend
+```bash
+npm install
+npm run dev
+```
+
+## 💰 Cost Estimation (3 Days / 10 Queries)
+
+| Component | Estimated Cost |
+| :--- | :--- |
+| **Cloud Run** | $0.00 (Free Tier) |
+| **Vertex AI** | < $0.0001 |
+| **Artifact Registry** | ~$0.01 |
+| **Total** | **~$0.01** |
+
+## 📄 License
+
+MIT
