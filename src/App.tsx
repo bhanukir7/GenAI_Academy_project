@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Loader2, TrendingUp, TrendingDown, Minus, Send, AlertCircle } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
 
 type Classification = 'Bullish' | 'Bearish' | 'Neutral';
 
@@ -29,7 +28,7 @@ const App: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ input }),
-      }).catch(err => {
+      }).catch(() => {
         throw { 
           message: 'Network Error: Could not connect to the backend server.', 
           suggestion: 'Ensure the backend server is running and accessible. If in preview, wait a few seconds and try again.' 
@@ -47,12 +46,12 @@ const App: React.FC = () => {
           } else {
             errorMessage = errorData.detail || errorMessage;
           }
-        } catch (e) {
+        } catch {
           // If not JSON, try to get text
           try {
             const text = await response.text();
             errorMessage = text || `Server Error: ${response.status} ${response.statusText}`;
-          } catch (textErr) {
+          } catch {
             errorMessage = `Server Error: ${response.status} ${response.statusText}`;
           }
         }
@@ -66,18 +65,19 @@ const App: React.FC = () => {
       }
 
       setResult(data.classification);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Analysis Error:', err);
+      const errorObj = err as { message: string; suggestion?: string };
       setError({ 
-        message: err.message || 'Something went wrong during analysis',
-        suggestion: err.suggestion
+        message: errorObj.message || 'Something went wrong during analysis',
+        suggestion: errorObj.suggestion
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const [healthInfo, setHealthInfo] = useState<any>(null);
+  const [healthInfo, setHealthInfo] = useState<Record<string, unknown> | null>(null);
 
   const checkHealth = async () => {
     try {
@@ -109,7 +109,7 @@ const App: React.FC = () => {
             Financial News Classifier
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
-            Analyze market sentiment using Gemini 3 Flash
+            Analyze market sentiment using Gemini 2.5 Flash
           </p>
         </div>
 
@@ -195,7 +195,7 @@ const App: React.FC = () => {
             )}
           </div>
           <div className="flex flex-col items-end gap-1">
-            <span className="text-[10px] text-slate-400 font-medium">Powered by Gemini 3 Flash</span>
+            <span className="text-[10px] text-slate-400 font-medium">Powered by Gemini 2.5 Flash</span>
             <button 
               onClick={checkHealth}
               className="text-[8px] text-slate-400 hover:text-slate-600 underline"
