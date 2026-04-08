@@ -44,4 +44,8 @@ echo "Deploying to Cloud Run..."
 cd terraform
 terraform apply -var="project_id=$PROJECT_ID" -var="region=$REGION" -auto-approve
 
+# Note: You must set the GEMINI_API_KEY environment variable in Cloud Run
+# You can do this via the console or by running:
+# gcloud run services update financial-news-classifier --set-env-vars GEMINI_API_KEY=your_key --region $REGION
+
 echo "Deployment complete! Your app is now using Project: $PROJECT_ID"

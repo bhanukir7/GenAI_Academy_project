@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Loader2, TrendingUp, TrendingDown, Minus, Send, AlertCircle } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
 
 type Classification = 'Bullish' | 'Bearish' | 'Neutral';
 
@@ -19,35 +18,23 @@ const App: React.FC = () => {
     setResult(null);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Classify this news as 'Bullish', 'Bearish', or 'Neutral': ${input}`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              classification: {
-                type: Type.STRING,
-                enum: ['Bullish', 'Bearish', 'Neutral'],
-              },
-            },
-            required: ["classification"],
-          },
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ text: input }),
       });
 
-      const text = response.text;
-      if (!text) {
-        throw new Error('The AI model returned an empty response.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to analyze sentiment');
       }
 
-      const data = JSON.parse(text);
+      const data = await response.json();
       
       if (!data || !data.classification) {
-        throw new Error('The AI model returned an unexpected response format.');
+        throw new Error('The server returned an unexpected response format.');
       }
 
       setResult(data.classification as Classification);
@@ -56,7 +43,7 @@ const App: React.FC = () => {
       const errorMessage = err instanceof Error ? err.message : 'Something went wrong during analysis';
       setError({ 
         message: errorMessage,
-        suggestion: 'Check your internet connection or try again later.'
+        suggestion: 'Ensure the backend is running and GEMINI_API_KEY is set.'
       });
     } finally {
       setLoading(false);
