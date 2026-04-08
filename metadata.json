@@ -1,0 +1,5 @@
+{
+  "name": "Financial News Classifier",
+  "description": "A full-stack financial news classifier agent using Gemini 1.5 Flash and FastAPI.",
+  "requestFramePermissions": []
+}
