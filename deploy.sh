@@ -2,7 +2,7 @@
 
 # Configuration
 PROJECT_ID="your-project-id"
-REGION="us-central1"
+REGION="us-central1" # Change this to 'us-central1' or other supported regions if you encounter 404s
 
 # 1. Check Dependencies
 echo "Checking dependencies..."

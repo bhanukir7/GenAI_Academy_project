@@ -1,6 +1,6 @@
 # Financial News Sentiment Classifier
 
-A production-ready, full-stack application that classifies financial news snippets into **Bullish**, **Bearish**, or **Neutral** categories using Google's Gemini 2.0 Flash model via Vertex AI.
+A production-ready, full-stack application that classifies financial news snippets into **Bullish**, **Bearish**, or **Neutral** categories using Google's Gemini 3 Flash model via Vertex AI.
 
 ## 🚀 Features
 
@@ -16,7 +16,7 @@ A production-ready, full-stack application that classifies financial news snippe
 - **Frontend:** React, TypeScript, Tailwind CSS, Lucide React, Framer Motion.
 - **Backend:** Python, FastAPI, Vertex AI SDK (`google-genai`).
 - **Infrastructure:** Terraform, Google Cloud Run, Artifact Registry.
-- **AI Model:** Gemini 2.0 Flash (via Vertex AI).
+- **AI Model:** Gemini 3 Flash (via Vertex AI).
 
 ## 🏗️ Architecture
 
@@ -29,6 +29,7 @@ This project follows Google Cloud best practices for security:
 ## 📋 Prerequisites
 
 - [Google Cloud Project](https://console.cloud.google.com/) with billing enabled.
+- **Enable Vertex AI API:** Go to the [Vertex AI API](https://console.cloud.google.com/apis/library/aiplatform.googleapis.com) page and click **Enable**.
 - [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) installed and authenticated.
 - [Docker](https://www.docker.com/) installed.
   - **WSL 2 Users:** Ensure Docker Desktop is running and "WSL Integration" is enabled for your specific distro in Docker Desktop settings.

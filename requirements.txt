@@ -2,4 +2,6 @@ fastapi
 uvicorn
 pydantic
 google-genai
+google-auth
+google-cloud-aiplatform
 python-dotenv

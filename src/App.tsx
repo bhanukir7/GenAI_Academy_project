@@ -13,7 +13,7 @@ const App: React.FC = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Classification | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; suggestion?: string } | null>(null);
 
   const analyzeSentiment = async () => {
     if (!input.trim()) return;
@@ -29,20 +29,64 @@ const App: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ input }),
+      }).catch(err => {
+        throw { 
+          message: 'Network Error: Could not connect to the backend server.', 
+          suggestion: 'Ensure the backend server is running and accessible. If in preview, wait a few seconds and try again.' 
+        };
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to analyze sentiment');
+        let errorMessage = 'Failed to analyze sentiment';
+        let suggestion = undefined;
+        try {
+          const errorData = await response.json();
+          if (errorData && typeof errorData.detail === 'object') {
+            errorMessage = errorData.detail.message || errorData.detail.error || errorMessage;
+            suggestion = errorData.detail.suggestion;
+          } else {
+            errorMessage = errorData.detail || errorMessage;
+          }
+        } catch (e) {
+          // If not JSON, try to get text
+          try {
+            const text = await response.text();
+            errorMessage = text || `Server Error: ${response.status} ${response.statusText}`;
+          } catch (textErr) {
+            errorMessage = `Server Error: ${response.status} ${response.statusText}`;
+          }
+        }
+        throw { message: errorMessage, suggestion };
       }
 
       const data: ClassificationResult = await response.json();
+      
+      if (!data || !data.classification) {
+        throw { message: 'The AI model returned an unexpected response format. Please try again.' };
+      }
+
       setResult(data.classification);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Analysis Error:', err);
-      setError(err instanceof Error ? err.message : 'Something went wrong during analysis');
+      setError({ 
+        message: err.message || 'Something went wrong during analysis',
+        suggestion: err.suggestion
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [healthInfo, setHealthInfo] = useState<any>(null);
+
+  const checkHealth = async () => {
+    try {
+      const response = await fetch('/api/health');
+      const data = await response.json();
+      setHealthInfo(data);
+    } catch (err) {
+      console.error('Health Check Error:', err);
+      setHealthInfo({ error: 'Could not reach health check endpoint' });
     }
   };
 
@@ -65,7 +109,7 @@ const App: React.FC = () => {
             Financial News Classifier
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
-            Analyze market sentiment using Gemini 1.5 Flash
+            Analyze market sentiment using Gemini 3 Flash
           </p>
         </div>
 
@@ -104,10 +148,15 @@ const App: React.FC = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-3 text-rose-600"
+                className="p-4 bg-rose-50 border border-rose-100 rounded-xl flex flex-col gap-1 text-rose-600"
               >
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <p className="text-sm font-medium">{error}</p>
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <p className="text-sm font-semibold">{error.message}</p>
+                </div>
+                {error.suggestion && (
+                  <p className="text-xs ml-8 opacity-80 italic">{error.suggestion}</p>
+                )}
               </motion.div>
             )}
 
@@ -131,6 +180,29 @@ const App: React.FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
+
+        <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">System Online</span>
+            </div>
+            {healthInfo && (
+              <div className="text-[8px] text-slate-400 font-mono bg-white p-1 rounded border border-slate-100 max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
+                {JSON.stringify(healthInfo)}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-[10px] text-slate-400 font-medium">Powered by Gemini 3 Flash</span>
+            <button 
+              onClick={checkHealth}
+              className="text-[8px] text-slate-400 hover:text-slate-600 underline"
+            >
+              Check Health
+            </button>
+          </div>
         </div>
       </div>
     </div>
