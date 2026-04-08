@@ -1,6 +1,6 @@
 # Financial News Sentiment Classifier
 
-A production-ready, full-stack application that classifies financial news snippets into **Bullish**, **Bearish**, or **Neutral** categories using Google's Gemini 1.5 Flash model via Vertex AI.
+A production-ready, full-stack application that classifies financial news snippets into **Bullish**, **Bearish**, or **Neutral** categories using Google's Gemini 2.0 Flash model via Vertex AI.
 
 ## 🚀 Features
 
@@ -16,7 +16,7 @@ A production-ready, full-stack application that classifies financial news snippe
 - **Frontend:** React, TypeScript, Tailwind CSS, Lucide React, Framer Motion.
 - **Backend:** Python, FastAPI, Vertex AI SDK (`google-genai`).
 - **Infrastructure:** Terraform, Google Cloud Run, Artifact Registry.
-- **AI Model:** Gemini 1.5 Flash (via Vertex AI).
+- **AI Model:** Gemini 2.0 Flash (via Vertex AI).
 
 ## 🏗️ Architecture
 
@@ -31,6 +31,7 @@ This project follows Google Cloud best practices for security:
 - [Google Cloud Project](https://console.cloud.google.com/) with billing enabled.
 - [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) installed and authenticated.
 - [Docker](https://www.docker.com/) installed.
+  - **WSL 2 Users:** Ensure Docker Desktop is running and "WSL Integration" is enabled for your specific distro in Docker Desktop settings.
 - [Terraform](https://www.terraform.io/) installed.
 - [Node.js](https://nodejs.org/) and [Python 3.10+](https://www.python.org/) for local development.
 
@@ -47,6 +48,12 @@ This project follows Google Cloud best practices for security:
    chmod +x deploy.sh
    ./deploy.sh
    ```
+
+### 🛠️ Troubleshooting Common Errors
+
+- **`vite: Permission denied`**: The script now automatically runs `npm install` and fixes permissions. If it persists, try running `chmod +x node_modules/.bin/vite` manually.
+- **`docker: command not found`**: In WSL 2, this means Docker Desktop is either not running or the WSL integration is disabled. Check your Docker Desktop settings.
+- **`Invalid quoted type constraints`**: This was a Terraform version compatibility issue which has been fixed in the provided `.tf` files.
    This script will:
    - Build the React frontend.
    - Initialize Terraform.
